@@ -33,8 +33,17 @@ def get_historical_results():
         
     df_res = pd.read_csv(results_path)
     df_rac = pd.read_csv(races_path)
+    df_cir = pd.read_csv(os.path.join(RAW_DIR, "circuits.csv"))
     
-    df = df_res.merge(df_rac[['raceId', 'year', 'round', 'name']], on='raceId', how='left')
+    # Unir resultados con carreras para tener circuitId y year
+    df = df_res.merge(df_rac[['raceId', 'year', 'round', 'name', 'circuitId']], on='raceId', how='left')
+    # Unir con circuitos para tener circuitRef
+    df = df.merge(df_cir[['circuitId', 'circuitRef']], on='circuitId', how='left')
+    
+    # Inyectar metadata de circuitos
+    from config.circuits import get_circuit_features
+    df['is_street'] = df['circuitRef'].apply(lambda x: get_circuit_features(x)['is_street'])
+    df['overtaking_difficulty'] = df['circuitRef'].apply(lambda x: get_circuit_features(x)['overtaking_difficulty'])
     
     if os.path.exists(drivers_path):
         df_drv = pd.read_csv(drivers_path)
@@ -73,8 +82,14 @@ def get_historical_sprints():
         
     df_spr = pd.read_csv(sprint_path)
     df_rac = pd.read_csv(races_path)
+    df_cir = pd.read_csv(os.path.join(RAW_DIR, "circuits.csv"))
     
-    df = df_spr.merge(df_rac[['raceId', 'year', 'round', 'name']], on='raceId', how='left')
+    df = df_spr.merge(df_rac[['raceId', 'year', 'round', 'name', 'circuitId']], on='raceId', how='left')
+    df = df.merge(df_cir[['circuitId', 'circuitRef']], on='circuitId', how='left')
+
+    from config.circuits import get_circuit_features
+    df['is_street'] = df['circuitRef'].apply(lambda x: get_circuit_features(x)['is_street'])
+    df['overtaking_difficulty'] = df['circuitRef'].apply(lambda x: get_circuit_features(x)['overtaking_difficulty'])
     
     if os.path.exists(drivers_path):
         df_drv = pd.read_csv(drivers_path)
@@ -149,7 +164,11 @@ def get_2026_actual_results():
                 if not races: continue
                 race = races[0]
                 rnd = int(race["round"])
+                circuit_id = race.get("Circuit", {}).get("circuitId", "unknown")
                 results = race.get("Results", [])
+                
+                from config.circuits import get_circuit_features
+                circuit_feats = get_circuit_features(circuit_id)
                 
                 for r in results:
                     # En la API status puede ser Finished, +1 Lap, etc.
@@ -173,7 +192,9 @@ def get_2026_actual_results():
                         "points": float(r["points"]),
                         "status": status,
                         "event": "race",
-                        "raceKey": _build_race_key(2026, rnd)
+                        "raceKey": _build_race_key(2026, rnd),
+                        "is_street": circuit_feats['is_street'],
+                        "overtaking_difficulty": circuit_feats['overtaking_difficulty']
                     })
             except Exception as e:
                 print(f"Error parseando {f}: {e}")
@@ -198,7 +219,11 @@ def get_2026_actual_sprints():
                     continue
                 race = races[0]
                 rnd = int(race["round"])
+                circuit_id = race.get("Circuit", {}).get("circuitId", "unknown")
                 results = race.get("SprintResults", [])
+
+                from config.circuits import get_circuit_features
+                circuit_feats = get_circuit_features(circuit_id)
 
                 for r in results:
                     pos = r.get("position", "22")
@@ -219,7 +244,9 @@ def get_2026_actual_sprints():
                         "points": float(r.get("points", 0)),
                         "status": status,
                         "event": "sprint",
-                        "raceKey": _build_race_key(2026, rnd)
+                        "raceKey": _build_race_key(2026, rnd),
+                        "is_street": circuit_feats['is_street'],
+                        "overtaking_difficulty": circuit_feats['overtaking_difficulty']
                     })
             except Exception as e:
                 print(f"Error parseando {f}: {e}")

@@ -198,7 +198,7 @@ class MLModel:
         df_ml = df_ml.dropna(subset=['position'])
         
         # Features X e Y (Target)
-        X = df_ml[['d_mean_pos', 'd_best_pos', 'd_mean_grid', 't_mean_pos', 'Starting_Grid']]
+        X = df_ml[['d_mean_pos', 'd_best_pos', 'd_mean_grid', 't_mean_pos', 'Starting_Grid', 'is_street', 'overtaking_difficulty']]
         y = df_ml['position']
         
         print(f"🤖 Entrenando XGBoost con {len(X)} registros históricos...")
@@ -211,7 +211,7 @@ class MLModel:
         team_rate = self.team_dnf.get(team_id, self.default_dnf)
         return 0.5 * driver_rate + 0.5 * team_rate
 
-    def sample_race(self, active_drivers, event_type='race', starting_grids=None):
+    def sample_race(self, active_drivers, event_type='race', starting_grids=None, is_street=0, overtaking_difficulty=2):
         """
         Inferencia del modelo ML + Variabilidad estocástica
         """
@@ -241,10 +241,12 @@ class MLModel:
                 d_feats['d_best_pos'],
                 mean_grid,
                 t_feats['t_mean_pos'],
-                actual_grid
+                actual_grid,
+                is_street,
+                overtaking_difficulty
             ])
             
-        X_infer = pd.DataFrame(infer_data, columns=['d_mean_pos', 'd_best_pos', 'd_mean_grid', 't_mean_pos', 'Starting_Grid'])
+        X_infer = pd.DataFrame(infer_data, columns=['d_mean_pos', 'd_best_pos', 'd_mean_grid', 't_mean_pos', 'Starting_Grid', 'is_street', 'overtaking_difficulty'])
         
         # 2. El modelo predice la Posición Esperada Pura
         expected_positions = self.model.predict(X_infer)

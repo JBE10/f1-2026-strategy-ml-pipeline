@@ -57,11 +57,32 @@ def main():
     if not df_act.empty:
         last_round = df_act['round'].max()
         
+    from src.standardize import get_2026_calendar
+    from config.circuits import get_circuit_features
+    df_cal = get_2026_calendar()
+    
     rounds_left = []
     for r in range(last_round + 1, 23): # 22 carreras en 2026
+        # Buscar circuitId en el calendario
+        circuit_id = "unknown"
+        if not df_cal.empty:
+            row_cal = df_cal[df_cal['round'] == r]
+            if not row_cal.empty:
+                # En races.csv de Kaggle, circuitId es un número, pero nosotros mapeamos circuitRef.
+                # Sin embargo, en standardize.py ya hicimos el merge.
+                # Vamos a obtener el circuitRef si es posible.
+                c_id = row_cal.iloc[0]['circuitId']
+                # Necesitamos circuits.csv para mapear circuitId a circuitRef
+                df_cir = pd.read_csv("data/raw/circuits.csv")
+                circuit_ref = df_cir[df_cir['circuitId'] == c_id]['circuitRef'].iloc[0]
+                circuit_id = circuit_ref
+        
+        c_feats = get_circuit_features(circuit_id)
         rounds_left.append({
             'round': r,
-            'has_sprint': r in SPRINT_ROUNDS_2026
+            'has_sprint': r in SPRINT_ROUNDS_2026,
+            'is_street': c_feats['is_street'],
+            'overtaking_difficulty': c_feats['overtaking_difficulty']
         })
         
     print(f"Pilotos activos: {len(active_drivers)}")

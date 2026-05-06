@@ -35,7 +35,10 @@ def run_simulation(current_standings, model, rounds_left, active_drivers, B=1000
         sim_positions = {k: v.copy() for k, v in base_positions.items()}
         
         for rnd in rounds_left:
-            orden_carrera = model.sample_race(active_drivers, event_type='race')
+            is_st = rnd.get('is_street', 0)
+            diff = rnd.get('overtaking_difficulty', 2)
+            
+            orden_carrera = model.sample_race(active_drivers, event_type='race', is_street=is_st, overtaking_difficulty=diff)
             pts_carrera = asignar_puntos(orden_carrera, tipo='race')
             
             for i, d in enumerate(orden_carrera, start=1):
@@ -43,7 +46,7 @@ def run_simulation(current_standings, model, rounds_left, active_drivers, B=1000
                 sim_positions[d].append(i)
                 
             if rnd.get('has_sprint', False):
-                orden_sprint = model.sample_race(active_drivers, event_type='sprint')
+                orden_sprint = model.sample_race(active_drivers, event_type='sprint', is_street=is_st, overtaking_difficulty=diff)
                 pts_sprint = asignar_puntos(orden_sprint, tipo='sprint')
                 for d in orden_sprint:
                     sim_points[d] += pts_sprint.get(d, 0)
@@ -104,15 +107,17 @@ def get_one_simulation_path(current_standings, model, rounds_left, active_driver
     
     for rnd in rounds_left:
         step_data = {'round': rnd['round'], 'sprint_winner': None, 'podium': []}
+        is_st = rnd.get('is_street', 0)
+        diff = rnd.get('overtaking_difficulty', 2)
         
         if rnd.get('has_sprint', False):
-            orden_sprint = model.sample_race(active_drivers, event_type='sprint')
+            orden_sprint = model.sample_race(active_drivers, event_type='sprint', is_street=is_st, overtaking_difficulty=diff)
             pts_sprint = asignar_puntos(orden_sprint, tipo='sprint')
             for d in orden_sprint:
                 sim_points[d] += pts_sprint.get(d, 0)
             step_data['sprint_winner'] = orden_sprint[0]
             
-        orden_carrera = model.sample_race(active_drivers, event_type='race')
+        orden_carrera = model.sample_race(active_drivers, event_type='race', is_street=is_st, overtaking_difficulty=diff)
         pts_carrera = asignar_puntos(orden_carrera, tipo='race')
         for d in orden_carrera:
             sim_points[d] += pts_carrera.get(d, 0)
