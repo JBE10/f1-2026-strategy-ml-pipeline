@@ -1,0 +1,20 @@
+{
+    "model": "MLModel_XGBoost",
+    "years_train": [
+        2023,
+        2024,
+        2025,
+        2026
+    ],
+    "seed": 42,
+    "B": 2000,
+    "ensemble_seeds": [
+        41,
+        42,
+        43,
+        44,
+        45
+    ],
+    "B_ensemble": 1000,
+    "ensemble_total_runs": 5000
+}
