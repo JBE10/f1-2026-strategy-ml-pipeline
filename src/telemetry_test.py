@@ -1,6 +1,11 @@
 import fastf1
 import pandas as pd
 import os
+import logging
+
+# Silenciar logs de requests y urllib3 para evitar tracebacks ruidosos en fechas futuras
+logging.getLogger("urllib3").setLevel(logging.ERROR)
+logging.getLogger("requests").setLevel(logging.ERROR)
 
 # Configurar caché (FastF1 descarga mucha data, es vital cachearla)
 cache_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'fastf1_cache')
@@ -8,19 +13,25 @@ os.makedirs(cache_dir, exist_ok=True)
 fastf1.Cache.enable_cache(cache_dir)
 
 def calculate_race_pace(year, round_num):
-    print(f"📡 Intentando conectar con los servidores de F1 Live Timing para {year} Ronda {round_num}...")
+    print(f"📡 Cargando datos de telemetría para {year} Ronda {round_num}...")
+    
+    # Si es una fecha futura, usamos directamente el fallback cacheado para evitar errores de red
+    if year >= 2026:
+        print(f"ℹ️  Nota: {year} es una fecha futura. Usando Japón 2024 como base de simulación (Dato cacheado).")
+        year, round_num = 2024, 4
+
     try:
-        # 'R' significa Carrera (Race). Podríamos usar 'Q' para Qualifying.
         session = fastf1.get_session(year, round_num, 'R')
-        # Cargamos datos de tiempos por vuelta. Desactivamos telemetría pesada (acelerador/freno) por ahora.
+        # Intentamos cargar. Si falla la red pero hay cache, fastf1 suele seguir adelante con warnings.
         session.load(telemetry=False, weather=False, messages=False)
     except Exception as e:
-        print(f"⚠️ No se pudieron obtener datos para {year}. Puede que la carrera no exista en la API real o haya un error de conexión.")
-        print("🔙 Fallback: Cargando datos históricos de Miami 2024 (Ronda 6) para demostración de Machine Learning...")
-        year, round_num = 2024, 6
-        session = fastf1.get_session(year, round_num, 'R')
-        session.load(telemetry=False, weather=False, messages=False)
+        print(f"⚠️ Error al cargar sesión: {e}")
+        return None
         
+    if not hasattr(session, 'laps') or len(session.laps) == 0:
+        print("❌ Error: No se pudieron cargar vueltas para esta sesión.")
+        return None
+
     laps = session.laps
     
     # FILTRO DE MACHINE LEARNING:
@@ -32,7 +43,7 @@ def calculate_race_pace(year, round_num):
     
     paces = []
     for driver in valid_laps['Driver'].unique():
-        driver_laps = valid_laps.pick_driver(driver)
+        driver_laps = valid_laps.pick_drivers(driver)
         if len(driver_laps) > 5: # Exigimos al menos 5 vueltas representativas
             mean_time = driver_laps['LapTime'].mean()
             median_time = driver_laps['LapTime'].median()
