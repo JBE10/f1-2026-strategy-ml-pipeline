@@ -58,13 +58,54 @@ def main():
             st.markdown("Datos extraídos de los servidores de **F1 Live Timing (FastF1)**. Representa la mediana del tiempo por vuelta, limpiando paradas en boxes y Safety Cars.")
             
             pace_path = "data/actual/race_pace_2026_r4.csv"
+            laps_path = "data/actual/valid_laps_2026_r4.csv"
+            
             if os.path.exists(pace_path):
                 df_pace = pd.read_csv(pace_path)
-                st.dataframe(df_pace, hide_index=True)
                 
-                st.markdown("#### Delta vs Líder (Segundos)")
-                df_plot = df_pace[['Driver', 'Delta_to_Leader_s']].set_index('Driver')
-                st.bar_chart(df_plot)
+                col_metric, col_plot = st.columns([1, 2])
+                with col_metric:
+                    st.dataframe(df_pace[['Driver', 'Median_Pace_s', 'Delta_to_Leader_s']], hide_index=True)
+                
+                with col_plot:
+                    st.markdown("#### Delta vs Líder (Segundos)")
+                    df_bar = df_pace[['Driver', 'Delta_to_Leader_s']].set_index('Driver')
+                    st.bar_chart(df_bar)
+                
+                if os.path.exists(laps_path):
+                    import seaborn as sns
+                    import matplotlib.pyplot as plt
+                    
+                    df_laps = pd.read_csv(laps_path)
+                    
+                    st.divider()
+                    st.subheader("📊 Análisis Gráfico de Consistencia")
+                    
+                    col_box, col_line = st.columns(2)
+                    
+                    with col_box:
+                        st.markdown("#### Distribución de Tiempos (Boxplot)")
+                        fig_box, ax_box = plt.subplots(figsize=(10, 6))
+                        # Ordenar por el más rápido según df_pace
+                        order = df_pace['Driver'].tolist()
+                        sns.boxplot(data=df_laps, x='Driver', y='LapTime_s', order=order, ax=ax_box, palette='viridis')
+                        ax_box.set_ylabel("Tiempo de Vuelta (s)")
+                        ax_box.set_xlabel("Piloto")
+                        plt.xticks(rotation=45)
+                        st.pyplot(fig_box)
+                        st.caption("El ancho de la caja indica la consistencia. Cajas más pequeñas = piloto más constante.")
+
+                    with col_line:
+                        st.markdown("#### Evolución del Ritmo (Trend)")
+                        selected_drivers = st.multiselect("Seleccionar Pilotos para comparar", order, default=order[:3])
+                        if selected_drivers:
+                            fig_line, ax_line = plt.subplots(figsize=(10, 6))
+                            df_sub = df_laps[df_laps['Driver'].isin(selected_drivers)]
+                            sns.lineplot(data=df_sub, x='LapNumber', y='LapTime_s', hue='Driver', ax=ax_line, marker='o')
+                            ax_line.set_ylabel("Tiempo de Vuelta (s)")
+                            ax_line.set_xlabel("Vuelta")
+                            st.pyplot(fig_line)
+                            st.caption("Muestra cómo varía el ritmo vuelta a vuelta (degradación y tráfico).")
             else:
                 st.warning("No hay datos de telemetría extraídos. Ejecuta 'python src/telemetry_test.py'")
 

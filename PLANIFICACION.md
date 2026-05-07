@@ -329,21 +329,29 @@ for b in range(B):  # B = 10_000 a 100_000
 
 ### Fase 2 · Modelo y simulación (Semana 2)
 
-| # | Tarea | Archivo |
-|---|-------|---------|
-| 2.1 | Modelo empírico | `src/models/empirico.py` — clase `EmpiricalModel` con `fit(df_results)` y `sample_race()` |
-| 2.2 | Motor MC | `src/simulate.py` — función `run_simulation(standings, modelo, rondas_restantes, B, seed)` |
-| 2.3 | Pipeline | `src/pipeline.py` — orquesta ingest → modelo → simulación → CSV output |
-| 2.4 | Tests | `tests/test_simulate.py` — verificar puntos, desempate, reproducibilidad con seed |
+| # | Tarea | Archivo | Estado |
+|---|-------|---------|--------|
+| 2.1 | Modelo empírico | `src/models/empirico.py` | ✅ |
+| 2.2 | Motor MC | `src/simulate.py` | ✅ |
+| 2.3 | Pipeline | `src/pipeline.py` | ✅ |
+| 2.4 | Tests | `tests/test_simulate.py` | ⏳ |
+| **2.5** | **Sensibilidad de Circuito (Nivel 1)** | `config/circuits.py` | ✅ |
 
 ### Fase 3 · Dashboard (Semana 3)
 
-| # | Tarea | Archivo |
-|---|-------|---------|
-| 3.1 | Pantalla A: Totales | `dashboard.py` — tabla + barras de $\hat{p}(\text{campeón})$ |
-| 3.2 | Pantalla B: Temporal | Gráfico de líneas $\hat{p}_i$ vs ronda |
-| 3.3 | Pantalla C: Próximo GP | Distribución simulada marginal |
-| 3.4 | Pantalla D: Parámetros | Modelo, $B$, seed, fecha datos, reglamento |
+| # | Tarea | Archivo | Estado |
+|---|-------|---------|--------|
+| 3.1 | Pantalla A: Totales | `dashboard.py` | ✅ |
+| 3.2 | Pantalla B: Temporal | `dashboard.py` | ✅ |
+| 3.3 | Pantalla C: Próximo GP | `dashboard.py` | ✅ |
+| 3.4 | Pantalla D: Parámetros | `dashboard.py` | ✅ |
+| **3.5** | **Visualización de Telemetría** | `dashboard.py` | ✅ |
+
+---
+
+## 10. Visualización de Telemetría (Gráficos)
+*   **Box Plot de Ritmo:** Mostrar la consistencia de cada piloto (rango intercuartílico de tiempos por vuelta).
+*   **Comparativa de Lap Times:** Gráfico de líneas con la evolución del ritmo durante la carrera (identificando stints y degradación).
 
 ### Fase 4 · Extensiones (Semana 4, si hay tiempo)
 

@@ -52,10 +52,22 @@ def calculate_race_pace(year, round_num):
     print("\n🏎️  RITMO DE CARRERA PURO (Mediana de vueltas válidas):")
     print(df_pace[['Driver', 'Median_Pace_s', 'Delta_to_Leader_s', 'Valid_Laps']].to_string(index=False))
     
-    # Guardar este feature para el modelo de ML
-    out_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'actual', f'race_pace_{year}_r{round_num}.csv')
+    # Guardar este feature para el modelo de ML (Agregado)
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    out_path = os.path.join(base_dir, 'data', 'actual', f'race_pace_{year}_r{round_num}.csv')
     df_pace.to_csv(out_path, index=False)
-    print(f"\n💾 Feature 'Ritmo de Carrera' guardado en: {out_path}")
+    
+    # NUEVO: Guardar TODAS las vueltas válidas para visualización detallada en el Dashboard
+    laps_path = os.path.join(base_dir, 'data', 'actual', f'valid_laps_{year}_r{round_num}.csv')
+    # Seleccionamos columnas útiles para ahorrar espacio
+    df_laps_export = valid_laps[['Driver', 'LapNumber', 'LapTime', 'Stint', 'Compound', 'TyreLife']].copy()
+    # Convertir LapTime a segundos (float)
+    df_laps_export['LapTime_s'] = df_laps_export['LapTime'].dt.total_seconds()
+    df_laps_export.drop(columns=['LapTime'], inplace=True)
+    df_laps_export.to_csv(laps_path, index=False)
+    
+    print(f"\n💾 Agregados guardados en: {out_path}")
+    print(f"💾 Vueltas detalladas guardadas en: {laps_path}")
     
     return df_pace
 
