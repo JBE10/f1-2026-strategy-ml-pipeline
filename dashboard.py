@@ -57,8 +57,8 @@ def main():
             st.subheader("📡 Telemetría en Vivo: Ritmo de Carrera Puro")
             st.markdown("Datos extraídos de los servidores de **F1 Live Timing (FastF1)**. Representa la mediana del tiempo por vuelta, limpiando paradas en boxes y Safety Cars.")
             
-            pace_path = "data/actual/race_pace_2026_r4.csv"
-            laps_path = "data/actual/valid_laps_2026_r4.csv"
+            pace_path = "data/actual/race_pace_2026_r6.csv"
+            laps_path = "data/actual/valid_laps_2026_r6.csv"
             
             if os.path.exists(pace_path):
                 df_pace = pd.read_csv(pace_path)
@@ -143,10 +143,16 @@ def main():
                             current_comp = comp_2
                             tyre_life = lap - pit_lap + 1
                             
-                        model = tire_models.get(current_comp, tire_models.get('MEDIUM'))
-                        time_lap_1 = model.predict(np.array([[1.0]]))[0]
-                        time_lap_n = model.predict(np.array([[float(tyre_life)]]))[0]
-                        degradation = max(0, time_lap_n - time_lap_1)
+                        model = tire_models.get(current_comp) or tire_models.get('MEDIUM')
+                        if model is None or not hasattr(model, 'is_fitted') and not hasattr(model, 'steps'): # Simple check or just try-except
+                            degradation = tyre_life * 0.1
+                        else:
+                            try:
+                                time_lap_1 = model.predict(np.array([[1.0]]))[0]
+                                time_lap_n = model.predict(np.array([[float(tyre_life)]]))[0]
+                                degradation = max(0, time_lap_n - time_lap_1)
+                            except Exception:
+                                degradation = tyre_life * 0.1
                         fuel_effect = lap * 0.06
                         
                         lap_time = base_pace + degradation - fuel_effect

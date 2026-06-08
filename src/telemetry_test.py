@@ -14,11 +14,17 @@ fastf1.Cache.enable_cache(cache_dir)
 
 def calculate_race_pace(year, round_num):
     print(f"📡 Cargando datos de telemetría para {year} Ronda {round_num}...")
+    original_year = year
+    original_round = round_num
     
     # Si es una fecha futura, usamos directamente el fallback cacheado para evitar errores de red
     if year >= 2026:
-        print(f"ℹ️  Nota: {year} es una fecha futura. Usando Japón 2024 como base de simulación (Dato cacheado).")
-        year, round_num = 2024, 4
+        if round_num == 6:
+            print(f"ℹ️  Nota: {year} es una fecha futura. Usando Mónaco 2024 como base de simulación (Dato cacheado).")
+            year, round_num = 2024, 8
+        else:
+            print(f"ℹ️  Nota: {year} es una fecha futura. Usando Japón 2024 como base de simulación (Dato cacheado).")
+            year, round_num = 2024, 4
 
     try:
         session = fastf1.get_session(year, round_num, 'R')
@@ -65,11 +71,11 @@ def calculate_race_pace(year, round_num):
     
     # Guardar este feature para el modelo de ML (Agregado)
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    out_path = os.path.join(base_dir, 'data', 'actual', f'race_pace_{year}_r{round_num}.csv')
+    out_path = os.path.join(base_dir, 'data', 'actual', f'race_pace_{original_year}_r{original_round}.csv')
     df_pace.to_csv(out_path, index=False)
     
     # NUEVO: Guardar TODAS las vueltas válidas para visualización detallada en el Dashboard
-    laps_path = os.path.join(base_dir, 'data', 'actual', f'valid_laps_{year}_r{round_num}.csv')
+    laps_path = os.path.join(base_dir, 'data', 'actual', f'valid_laps_{original_year}_r{original_round}.csv')
     # Seleccionamos columnas útiles para ahorrar espacio
     df_laps_export = valid_laps[['Driver', 'LapNumber', 'LapTime', 'Stint', 'Compound', 'TyreLife']].copy()
     # Convertir LapTime a segundos (float)
@@ -83,5 +89,5 @@ def calculate_race_pace(year, round_num):
     return df_pace
 
 if __name__ == "__main__":
-    # Intentamos cargar Miami (Ronda 4 en el calendario 2026 planificado)
-    calculate_race_pace(2026, 4)
+    # Intentamos cargar Mónaco (Ronda 6 en el calendario 2026 planificado)
+    calculate_race_pace(2026, 6)

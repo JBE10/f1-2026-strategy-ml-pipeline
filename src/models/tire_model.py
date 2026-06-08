@@ -16,6 +16,7 @@ class TireDegradationModel:
             'HARD': make_pipeline(PolynomialFeatures(2), LinearRegression())
         }
         self.is_trained = False
+        self.trained_compounds = set()
         
     def fit(self, df_laps):
         # df_laps debe tener: 'Compound', 'TyreLife', 'LapTime_s'
@@ -24,15 +25,17 @@ class TireDegradationModel:
         for compound in ['SOFT', 'MEDIUM', 'HARD']:
             df_comp = df_laps[df_laps['Compound'] == compound].copy()
             if len(df_comp) < 10:
+                print(f"⚠️ Neumático {compound} omitido: solo {len(df_comp)} vueltas (mínimo 10).")
                 continue
                 
             X = df_comp[['TyreLife']]
             y = df_comp['LapTime_s']
             
             self.models[compound].fit(X, y)
+            self.trained_compounds.add(compound)
             print(f"✅ Neumático {compound} entrenado con {len(df_comp)} vueltas.")
             
-        self.is_trained = True
+        self.is_trained = len(self.trained_compounds) > 0
         
     def predict_lap_time(self, compound, tyre_life, base_pace):
         """
@@ -42,8 +45,13 @@ class TireDegradationModel:
         if not self.is_trained:
             return base_pace + (tyre_life * 0.1) # Fallback tonto
             
-        if compound not in self.models:
-            compound = 'MEDIUM' # Fallback
+        if compound not in self.trained_compounds:
+            if 'MEDIUM' in self.trained_compounds:
+                compound = 'MEDIUM'
+            elif self.trained_compounds:
+                compound = next(iter(self.trained_compounds))
+            else:
+                return base_pace + (tyre_life * 0.1)
             
         # El modelo predice un lap_time histórico general. 
         # Lo que nos importa es el DELTA (cuántos segundos más lento es en la vuelta N comparado con la 1).

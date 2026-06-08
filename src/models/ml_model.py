@@ -34,9 +34,17 @@ class MLModel:
         self._load_telemetry()
 
     def _load_telemetry(self):
-        pace_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'actual', 'race_pace_2026_r4.csv')
-        if os.path.exists(pace_path):
-            print("🚀 Inyectando Telemetría de FastF1 (Ritmo de Carrera) en el modelo...")
+        data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'data', 'actual')
+        pace_path = None
+        if os.path.isdir(data_dir):
+            import glob
+            candidates = sorted(glob.glob(os.path.join(data_dir, 'race_pace_2026_r*.csv')))
+            if candidates:
+                pace_path = candidates[-1] # El más reciente por orden alfabético/numérico
+                
+        if pace_path and os.path.exists(pace_path):
+            round_name = os.path.basename(pace_path)
+            print(f"🚀 Inyectando Telemetría de FastF1 ({round_name}) en el modelo...")
             df_pace = pd.read_csv(pace_path)
             df_pace['Pace_Rank'] = df_pace['Median_Pace_s'].rank(method='min')
             for _, row in df_pace.iterrows():
@@ -104,16 +112,13 @@ class MLModel:
             pos = pd.to_numeric(row.get('position'), errors='coerce')
             pos_val = 20 if pd.isna(pos) else float(pos)
             
-            # PACE PROXY: intentamos usar la telemetría real, si no, fallback a la grid
-            race_key = f"{int(row['year'])}_{int(row['round'])}"
-            if hasattr(self, 'historical_pace_rank') and race_key in self.historical_pace_rank and d_id in self.historical_pace_rank[race_key]:
-                pace_val = float(self.historical_pace_rank[race_key][d_id])
+            # PACE PROXY: usamos la posición de parrilla como aproximación del ritmo puro
+            # (La telemetría real de FastF1 se inyecta en sample_race via self.real_pace_rank)
+            grid_val = pd.to_numeric(row.get('grid'), errors='coerce')
+            if pd.isna(grid_val) or grid_val == 0:
+                pace_val = 20.0
             else:
-                grid_val = pd.to_numeric(row.get('grid'), errors='coerce')
-                if pd.isna(grid_val) or grid_val == 0:
-                    pace_val = 20.0
-                else:
-                    pace_val = float(grid_val)
+                pace_val = float(grid_val)
             
             if d_id not in driver_history_pos: driver_history_pos[d_id] = []
             driver_history_pos[d_id].append(pos_val)

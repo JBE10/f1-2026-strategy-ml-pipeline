@@ -106,20 +106,23 @@ class FactorialModel:
 
             if mask.any():
                 driver_scores = df_team.groupby('driverId').apply(
-                    lambda g: np.average(g['delta'], weights=g['weight'])
+                    lambda g: np.average(g['delta'], weights=g['weight']),
+                    include_groups=False
                 ).to_dict()
             else:
                 use_delta = False
 
         if not use_delta:
             driver_scores = df_perf.groupby('driverId').apply(
-                lambda g: np.average(g['inv_pos'], weights=g['weight'])
+                lambda g: np.average(g['inv_pos'], weights=g['weight']),
+                include_groups=False
             ).to_dict()
 
         team_scores = {}
         if 'constructorId' in df_perf.columns:
             team_scores = df_perf.groupby('constructorId').apply(
-                lambda g: np.average(g['inv_pos'], weights=g['weight'])
+                lambda g: np.average(g['inv_pos'], weights=g['weight']),
+                include_groups=False
             ).to_dict()
 
         driver_scores_norm, driver_mean, driver_std = self._normalize_ratings(driver_scores)
@@ -209,7 +212,7 @@ class FactorialModel:
         team_rate = self.team_dnf.get(team_id, self.default_dnf)
         return 0.5 * driver_rate + 0.5 * team_rate
 
-    def sample_race(self, active_drivers, event_type='race'):
+    def sample_race(self, active_drivers, event_type='race', **kwargs):
         scores = {}
         event_factor = 1.0 if event_type == 'race' else 0.85
 

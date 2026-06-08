@@ -6,3 +6,5 @@ data/actual/*
 __pycache__/
 *.pyc
 .DS_Store
+data/fastf1_cache/
+

@@ -1,92 +1,74 @@
 {
     "history": [
         {
-            "round": 5,
-            "sprint_winner": "antonelli",
-            "podium": [
-                "hamilton",
-                "russell",
-                "piastri"
-            ]
-        },
-        {
-            "round": 6,
-            "sprint_winner": null,
-            "podium": [
-                "leclerc",
-                "antonelli",
-                "russell"
-            ]
-        },
-        {
             "round": 7,
             "sprint_winner": null,
             "podium": [
-                "antonelli",
-                "piastri",
-                "leclerc"
+                "hamilton",
+                "leclerc",
+                "antonelli"
             ]
         },
         {
             "round": 8,
             "sprint_winner": null,
             "podium": [
-                "russell",
                 "antonelli",
+                "russell",
                 "hamilton"
             ]
         },
         {
             "round": 9,
-            "sprint_winner": "norris",
+            "sprint_winner": "leclerc",
             "podium": [
                 "russell",
-                "leclerc",
-                "antonelli"
+                "hamilton",
+                "max_verstappen"
             ]
         },
         {
             "round": 10,
             "sprint_winner": null,
             "podium": [
-                "russell",
+                "hamilton",
                 "antonelli",
-                "leclerc"
+                "piastri"
             ]
         },
         {
             "round": 11,
             "sprint_winner": null,
             "podium": [
-                "russell",
-                "leclerc",
-                "antonelli"
+                "norris",
+                "max_verstappen",
+                "hamilton"
             ]
         },
         {
             "round": 12,
-            "sprint_winner": "russell",
+            "sprint_winner": "hamilton",
             "podium": [
                 "russell",
-                "norris",
-                "hamilton"
+                "hamilton",
+                "piastri"
             ]
         },
         {
             "round": 13,
             "sprint_winner": null,
             "podium": [
-                "russell",
-                "piastri",
-                "leclerc"
+                "norris",
+                "max_verstappen",
+                "russell"
             ]
         },
         {
             "round": 14,
             "sprint_winner": null,
             "podium": [
-                "russell",
                 "norris",
+                "antonelli",
                 "piastri"
             ]
         },
@@ -94,44 +76,44 @@
             "round": 15,
             "sprint_winner": null,
             "podium": [
-                "piastri",
                 "antonelli",
-                "russell"
+                "norris",
+                "hamilton"
             ]
         },
         {
             "round": 16,
-            "sprint_winner": "russell",
+            "sprint_winner": "max_verstappen",
             "podium": [
-                "russell",
-                "antonelli",
-                "norris"
+                "hamilton",
+                "norris",
+                "antonelli"
             ]
         },
         {
             "round": 17,
             "sprint_winner": null,
             "podium": [
-                "norris",
-                "piastri",
-                "hamilton"
+                "antonelli",
+                "hamilton",
+                "max_verstappen"
             ]
         },
         {
             "round": 18,
             "sprint_winner": null,
             "podium": [
-                "russell",
-                "leclerc",
-                "arvid_lindblad"
+                "max_verstappen",
+                "norris",
+                "hamilton"
             ]
         },
         {
             "round": 19,
             "sprint_winner": null,
             "podium": [
-                "russell",
-                "antonelli",
+                "max_verstappen",
+                "hamilton",
                 "piastri"
             ]
         },
@@ -139,118 +121,118 @@
             "round": 20,
             "sprint_winner": null,
             "podium": [
-                "piastri",
-                "antonelli",
-                "russell"
+                "max_verstappen",
+                "hamilton",
+                "antonelli"
             ]
         },
         {
             "round": 21,
             "sprint_winner": null,
             "podium": [
-                "russell",
-                "antonelli",
-                "hamilton"
+                "norris",
+                "piastri",
+                "leclerc"
             ]
         },
         {
             "round": 22,
             "sprint_winner": null,
             "podium": [
-                "antonelli",
                 "norris",
-                "leclerc"
+                "antonelli",
+                "max_verstappen"
             ]
         }
     ],
     "final_standings": [
         [
-            "russell",
-            439.0
-        ],
-        [
             "antonelli",
-            356.0
-        ],
-        [
-            "leclerc",
-            270.0
-        ],
-        [
-            "norris",
-            235.0
-        ],
-        [
-            "piastri",
-            225.0
+            399.0
         ],
         [
             "hamilton",
-            223.0
+            360.0
+        ],
+        [
+            "norris",
+            318.0
+        ],
+        [
+            "russell",
+            279.0
         ],
         [
             "max_verstappen",
-            123.0
+            279.0
         ],
         [
-            "arvid_lindblad",
-            100.0
+            "leclerc",
+            243.0
+        ],
+        [
+            "piastri",
+            193.0
         ],
         [
             "gasly",
-            78.0
-        ],
-        [
-            "hulkenberg",
-            65.0
-        ],
-        [
-            "bearman",
-            63.0
-        ],
-        [
-            "colapinto",
-            60.0
-        ],
-        [
-            "ocon",
-            55.0
-        ],
-        [
-            "lawson",
-            49.0
-        ],
-        [
-            "hadjar",
-            28.0
-        ],
-        [
-            "stroll",
-            17.0
-        ],
-        [
-            "perez",
-            14.0
+            70.0
         ],
         [
             "sainz",
-            12.0
+            52.0
         ],
         [
-            "albon",
+            "lawson",
+            46.0
+        ],
+        [
+            "colapinto",
+            41.0
+        ],
+        [
+            "bearman",
+            22.0
+        ],
+        [
+            "hadjar",
+            20.0
+        ],
+        [
+            "ocon",
             8.0
         ],
         [
-            "bottas",
-            7.0
+            "stroll",
+            8.0
         ],
         [
-            "alonso",
-            7.0
+            "arvid_lindblad",
+            5.0
+        ],
+        [
+            "albon",
+            4.0
         ],
         [
             "bortoleto",
-            4.0
+            2.0
+        ],
+        [
+            "hulkenberg",
+            0.0
+        ],
+        [
+            "bottas",
+            0.0
+        ],
+        [
+            "perez",
+            0.0
+        ],
+        [
+            "alonso",
+            0.0
         ]
     ]
 }

@@ -99,15 +99,18 @@ def main():
     ENSEMBLE_SEEDS = [41, 42, 43, 44, 45]
     B_ENSEMBLE = 1000
 
+    # Solo carreras principales (excluyendo sprints) para el historial de posiciones del desempate
+    df_act_races = df_act[df_act['event'] == 'race'] if (not df_act.empty and 'event' in df_act.columns) else df_act
+
     print(f"Ejecutando Monte Carlo con B={B}...")
-    df_metrics = run_simulation(standings, model, rounds_left, active_drivers, B=B, seed=SEED)
+    df_metrics = run_simulation(standings, model, rounds_left, active_drivers, B=B, seed=SEED, actual_results=df_act_races)
 
     df_ensemble = pd.DataFrame()
     if ENSEMBLE_SEEDS and B_ENSEMBLE > 0:
         print(f"Ejecutando ensemble de semillas: {len(ENSEMBLE_SEEDS)} x B={B_ENSEMBLE}...")
         frames = []
         for seed in ENSEMBLE_SEEDS:
-            df_seed = run_simulation(standings, model, rounds_left, active_drivers, B=B_ENSEMBLE, seed=seed)
+            df_seed = run_simulation(standings, model, rounds_left, active_drivers, B=B_ENSEMBLE, seed=seed, actual_results=df_act_races)
             df_seed['seed'] = seed
             frames.append(df_seed)
         if frames:

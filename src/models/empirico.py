@@ -49,7 +49,7 @@ class EmpiricalModel:
         else:
             self.fallback_profile = {'positions': list(range(1, 23)), 'weights': [1/22]*22}
             
-    def sample_race(self, active_drivers, event_type='race'):
+    def sample_race(self, active_drivers, event_type='race', **kwargs):
         """
         Simula una carrera ponderando los resultados recientes.
         """

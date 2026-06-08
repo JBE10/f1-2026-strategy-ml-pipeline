@@ -120,7 +120,7 @@ class TrueSkillModel:
         team_rate = self.team_dnf.get(team_id, self.default_dnf)
         return 0.5 * driver_rate + 0.5 * team_rate
 
-    def sample_race(self, active_drivers, event_type='race'):
+    def sample_race(self, active_drivers, event_type='race', **kwargs):
         """
         Simula una carrera muestreando de las distribuciones normales de TrueSkill.
         """

@@ -6,7 +6,7 @@ import pandas as pd
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config.puntos import asignar_puntos, sort_key_desempate
 
-def run_simulation(current_standings, model, rounds_left, active_drivers, B=10000, seed=42):
+def run_simulation(current_standings, model, rounds_left, active_drivers, B=10000, seed=42, actual_results=None):
     """
     Ejecuta el Monte Carlo y retorna un dict con las probabilidades de ser campeón.
     """
@@ -23,9 +23,15 @@ def run_simulation(current_standings, model, rounds_left, active_drivers, B=1000
             d = row['driverId']
             if d in active_drivers:
                 base_points[d] = row.get('points', 0)
-                wins = int(row.get('wins', 0))
-                if wins > 0:
-                    base_positions[d].extend([1] * wins)
+                
+    # Cargar todas las posiciones obtenidas en carreras reales ya disputadas
+    if actual_results is not None and not actual_results.empty:
+        for _, row in actual_results.iterrows():
+            d = row['driverId']
+            if d in active_drivers:
+                pos = pd.to_numeric(row.get('position'), errors='coerce')
+                if not pd.isna(pos):
+                    base_positions[d].append(int(pos))
                     
     results = []
     driver_metrics = {}
